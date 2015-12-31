@@ -18,12 +18,31 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/box/{name}', function ($name) use ($app) {
-    return app('cache')->store('file')->get($name);
+    $details = app('cache')->store('file')->get($name);
+    if (!$details) {
+        return response("Not found", 404);
+    }
+    return $details;
+});
+
+$app->get('/box/{name}/revision/{revision}', function ($name, $revision) use ($app) {
+    $details = app('cache')->store('file')->get($name);
+    if (!$details) {
+        return response("Not found", 404);
+    }
+    if ($details['revision'] != $revision) {
+        return $details;
+    }
+    return response(null, 204);
 });
 
 $app->post('/box/{name}', function ($name, Request $request) use ($app) {
+    $details = $request->all();
+    if (!array_key_exists("revision", $details)) {
+        throw new Exception("No revision number set.");
+    }
     app('cache')->store('file')->forever($name, $request->all());
-    return $request->all();
+    return;
 });
 
 $app->delete('/box/{name}', function ($name) use ($app) {
