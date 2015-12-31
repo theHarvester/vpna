@@ -13,9 +13,6 @@
 
 use Illuminate\Http\Request;
 
-$app->get('/', function () use ($app) {
-    return $app->welcome();
-});
 
 $app->get('/box/{name}', function ($name) use ($app) {
     $details = app('cache')->store('file')->get($name);
@@ -48,4 +45,8 @@ $app->post('/box/{name}', function ($name, Request $request) use ($app) {
 $app->delete('/box/{name}', function ($name) use ($app) {
     app('cache')->store('file')->forget($name);
     return response("Deleted", 204);
+});
+
+$app->get('/', function () use ($app) {
+    return $app->welcome();
 });
